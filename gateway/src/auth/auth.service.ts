@@ -120,11 +120,28 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
     const roles = user.userRoles?.map((ur) => ur.role?.name) || [];
+    // --- Permissions logic start ---
+    // Fetch permissions for the user via their roles
+    const permissionsSet = new Set<string>();
+    for (const ur of user.userRoles) {
+      const roleWithPerms = await this.roleRepository.findOne({
+        where: { id: ur.role.id },
+        relations: ['rolePermissions', 'rolePermissions.permission'],
+      });
+      if (roleWithPerms?.rolePermissions) {
+        for (const rp of roleWithPerms.rolePermissions) {
+          if (rp.permission?.name) permissionsSet.add(rp.permission.name);
+        }
+      }
+    }
+    const permissions = Array.from(permissionsSet);
+    // --- Permissions logic end ---
     const payload = {
       username: user.username,
       sub: user.id,
       roles,
       userRoles: user.userRoles,
+      permissions,
     };
     const accessToken = this.jwtService.sign(payload);
     return { accessToken };

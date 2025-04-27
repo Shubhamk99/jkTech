@@ -13,6 +13,7 @@ npm run migrations:up
 
 echo "[3/6] Seeding database (roles, permissions, admin user)..."
 npx ts-node ./db/seeds/seed-all.ts
+npx ts-node ./db/seeds/seed-permissions.ts
 
 echo "[4/6] Building the project..."
 npm run build

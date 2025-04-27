@@ -8,6 +8,7 @@ interface JwtPayload {
   username: string;
   roles: string[];
   userRoles?: { role: { name: string } }[];
+  permissions?: string[];
 }
 
 @Injectable()
@@ -29,6 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         ? payload.roles.filter((r) => typeof r === 'string')
         : [],
       userRoles: Array.isArray(payload.userRoles) ? payload.userRoles : [],
+      permissions: Array.isArray(payload.permissions) ? payload.permissions : [],
     };
   }
 }
