@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  gateway:
+    build:
+      context: ./gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    depends_on:
+      - mock-ingestion
+      - postgres
+    env_file:
+      - .env
+
+  mock-ingestion:
+    build:
+      context: ./mock-ingestion
+    ports:
+      - "4001:4001"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata3:/var/lib/postgresql/data
+
+volumes:
+  pgdata3:
